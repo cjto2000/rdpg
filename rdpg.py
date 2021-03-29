@@ -64,7 +64,9 @@ class RDPG:
         t = 0
         n = 0
         hidden_states = None
+        n_steps = 0
         for _ in range(THRESHOLD_STEPS):
+            n_steps += 1
             self.env.render()
             H_var, S_var = history.get()
             H_var = Variable(torch.FloatTensor(H_var)).unsqueeze(0).to(device) # H_var has shape (1, t + 1, 28)
@@ -124,20 +126,20 @@ class RDPG:
         # Update critic
         critic_loss = torch.mean(torch.pow(target_y - y, 2))
         self.critic_optimizer.zero_grad() # zeros the gradients for backprop
-        critic_loss.backward() # adds to gradients
-        self.critic_optimizer.step() # backprops
+        critic_loss.backward() # add to gradients
+        self.critic_optimizer.step() # backprop
 
         # Update actor
         A_actor, hidden_states = self.actor_net(H_batch, O_batch)
         assert(A_actor.shape == (BATCH_SIZE, LENGTH, 4))
         actor_loss = -1 * torch.mean(self.critic_net(H_batch, A_actor)[0])
         self.actor_optimizer.zero_grad() # zeros the gradients for backprop
-        actor_loss.backward() # adds to gradients
-        self.actor_optimizer.step() # backprops
+        actor_loss.backward() # add to gradients
+        self.actor_optimizer.step() # backprop
 
         self.soft_update()
         self.noise.reset()
-        return critic_loss, actor_loss, R_total
+        return critic_loss, actor_loss, R_total, n_steps
 
 
     def soft_update(self):
