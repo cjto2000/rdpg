@@ -11,7 +11,7 @@ import numpy as np
 from rdpg_constants import *
 from rdpg_models import Actor, Critic
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 class Orn_Uhlen:
     def __init__(self, n_actions, mu=0, theta=0.15, sigma=0.2):
@@ -67,7 +67,7 @@ class RDPG:
         n_steps = 0
         for _ in range(THRESHOLD_STEPS):
             n_steps += 1
-            self.env.render()
+            #self.env.render()
             H_var, S_var = history.get()
             H_var = Variable(torch.FloatTensor(H_var)).unsqueeze(0).to(device) # H_var has shape (1, t + 1, 28)
             assert(H_var.shape == (1, 1, 28))
@@ -102,11 +102,11 @@ class RDPG:
         O_batch = self.memory.sample_observations() # O_batch is (BATCH_SIZE, LENGTH, 24)
         assert(O_batch.shape == (BATCH_SIZE, LENGTH, 24))
 
-        H_batch = torch.from_numpy(H_batch).float()
+        H_batch = torch.from_numpy(H_batch).float().to(device)
 
-        R_batch = torch.from_numpy(R_batch).float()
-        A_batch = torch.from_numpy(A_batch).float()
-        O_batch = torch.from_numpy(O_batch).float()
+        R_batch = torch.from_numpy(R_batch).float().to(device)
+        A_batch = torch.from_numpy(A_batch).float().to(device)
+        O_batch = torch.from_numpy(O_batch).float().to(device)
 
         A_critic, hidden_states = self.target_actor_net(H_batch[:, 1:], O_batch[:, 1:]) # A_critic should be (BATCH_SIZE, LENGTH - 1, 4)
         assert(A_critic.shape == (BATCH_SIZE, LENGTH - 1, 4))
