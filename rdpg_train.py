@@ -1,5 +1,5 @@
 import torch
-
+import json
 import pickle
 import os
 
@@ -67,15 +67,17 @@ if __name__ == "__main__":
     for i in range(N_EPISODES):
         l1, l2, R, n_steps = agent.train_one_episode(BATCH_SIZE)
         total_steps += n_steps
-        best_reward = max(R, best_reward)
+        best_reward = max(R.item(), best_reward)
         running_R = 0.9 * running_R + 0.1 * R
         if i % LOG_STEPS == 0:
             history["rewards"].append(running_R)
-            history["critic_loss"].append(l1)
-            history["actor_loss"].append(l2)
+            history["critic_loss"].append(l1.item())
+            history["actor_loss"].append(l2.item())
             history['best_reward'] = best_reward
             history['total_steps'] = total_steps
             history["steps"].append(total_steps)
+            with open('history.json', 'w') as f:
+                json.dump(history, f)
             print("Episode %5d -- Rewards : %.5f -- Losses: %.5f(a)  %.5f(c) -- Best Reward: %.5f -- Total Steps: %d" % (i, running_R, l2, l1, best_reward, total_steps))
         if R > best_reward:
             best_reward = R

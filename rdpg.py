@@ -61,7 +61,7 @@ class RDPG:
         history = History(self.state_dim, self.action_dim)
         history.append(S, S_prime, A, R) # seed for RNN
         S = S_prime
-        t = 0
+        t = 0 # current time step
         n = 0
         hidden_states = None
         n_steps = 0
@@ -111,7 +111,7 @@ class RDPG:
         A_critic, hidden_states = self.target_actor_net(H_batch[:, 1:], O_batch[:, 1:]) # A_critic should be (BATCH_SIZE, LENGTH - 1, 4)
         assert(A_critic.shape == (BATCH_SIZE, LENGTH - 1, 4))
         A_critic = A_critic.detach()
-        Q_Spr_A, hidden_states = self.target_critic_net(H_batch[:, 1:], A_critic) # Q_Spr_A should be (BATCH_SIZE, LENGTH - 1, 1)
+        Q_Spr_A = self.target_critic_net(H_batch[:, 1:], A_critic) # Q_Spr_A should be (BATCH_SIZE, LENGTH - 1, 1)
         assert(Q_Spr_A.shape == (BATCH_SIZE, LENGTH - 1, 1))
         Q_Spr_A = Q_Spr_A.detach()
 
@@ -120,7 +120,7 @@ class RDPG:
         assert(target_y.shape == (BATCH_SIZE, LENGTH - 1, 1))
 
         # Compute estimated values
-        y, hidden_states = self.critic_net(H_batch[:, :-1], A_batch[:, :-1])
+        y = self.critic_net(H_batch[:, :-1], A_batch[:, :-1])
         assert(y.shape == (BATCH_SIZE, LENGTH - 1, 1))
 
         # Update critic
@@ -132,7 +132,7 @@ class RDPG:
         # Update actor
         A_actor, hidden_states = self.actor_net(H_batch, O_batch)
         assert(A_actor.shape == (BATCH_SIZE, LENGTH, 4))
-        actor_loss = -1 * torch.mean(self.critic_net(H_batch, A_actor)[0])
+        actor_loss = -1 * torch.mean(self.critic_net(H_batch, A_actor))
         self.actor_optimizer.zero_grad() # zeros the gradients for backprop
         actor_loss.backward() # add to gradients
         self.actor_optimizer.step() # backprop
