@@ -25,6 +25,7 @@ class Actor(nn.Module):
     def inference(self, x, obs, hidden_state=None):
         """
         x is a single dim numpy array (28,)
+        - 28 because state is 24 dim and action is 4 dim
         """
         x = x.view(1, -1).unsqueeze(0)
         obs = obs.view(1, -1).unsqueeze(0)

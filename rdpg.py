@@ -69,10 +69,10 @@ class RDPG:
             n_steps += 1
             #self.env.render()
             H_var, S_var = history.get()
-            H_var = Variable(torch.FloatTensor(H_var)).unsqueeze(0).to(device) # H_var has shape (1, t + 1, 28)
+            H_var = Variable(torch.FloatTensor(H_var)).unsqueeze(0).to(device) # H_var has shape (1, 1, 28)
             assert(H_var.shape == (1, 1, 28))
             S_var = Variable(torch.FloatTensor(S_var).unsqueeze(0).to(device))
-            A_pred, hidden_states = self.actor_net(H_var, S_var, hidden_states) # A_pred has shape (1, _, 4)
+            A_pred, hidden_states = self.actor_net(H_var, S_var, hidden_states) # A_pred has shape (1, 1, 4)
             assert(A_pred.shape == (1, 1, 4))
             A_pred = A_pred.detach()[-1][-1]
             noise = self.noise.sample()
