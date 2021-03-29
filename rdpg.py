@@ -111,7 +111,7 @@ class RDPG:
         A_critic, hidden_states = self.target_actor_net(H_batch[:, 1:], O_batch[:, 1:]) # A_critic should be (BATCH_SIZE, LENGTH - 1, 4)
         assert(A_critic.shape == (BATCH_SIZE, LENGTH - 1, 4))
         A_critic = A_critic.detach()
-        Q_Spr_A = self.target_critic_net(H_batch[:, 1:], A_critic) # Q_Spr_A should be (BATCH_SIZE, LENGTH - 1, 1)
+        Q_Spr_A, hiddens_states = self.target_critic_net(H_batch[:, 1:], A_critic) # Q_Spr_A should be (BATCH_SIZE, LENGTH - 1, 1)
         assert(Q_Spr_A.shape == (BATCH_SIZE, LENGTH - 1, 1))
         Q_Spr_A = Q_Spr_A.detach()
 
