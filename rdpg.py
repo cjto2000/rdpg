@@ -133,6 +133,7 @@ class RDPG:
         A_actor, hidden_states = self.actor_net(H_batch, O_batch)
         assert(A_actor.shape == (BATCH_SIZE, LENGTH, 4))
         actor_loss = -1 * torch.mean(self.critic_net(H_batch, A_actor))
+        actor_loss /= LENGTH
         self.actor_optimizer.zero_grad() # zeros the gradients for backprop
         actor_loss.backward() # add to gradients
         self.actor_optimizer.step() # backprop
