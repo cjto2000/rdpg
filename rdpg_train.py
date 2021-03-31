@@ -70,10 +70,10 @@ if __name__ == "__main__":
         best_reward = max(R.item(), best_reward)
         running_R = 0.9 * running_R + 0.1 * R
         if i % LOG_STEPS == 0:
-            history["rewards"].append(running_R)
-            history["critic_loss"].append(l1.item())
-            history["actor_loss"].append(l2.item())
-            history['best_reward'] = best_reward
+            history["rewards"].append(round(running_R, 2))
+            history["critic_loss"].append(round(l1.item(), 2))
+            history["actor_loss"].append(round(l2.item(), 2))
+            history['best_reward'] = round(best_reward, 2)
             history['total_steps'] = total_steps
             history["steps"].append(total_steps)
             with open('history.json', 'w') as f:
