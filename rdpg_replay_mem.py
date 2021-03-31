@@ -6,6 +6,7 @@ class ReplayMemory:
     def __init__(self, state_dim, action_dim):
         self.index = 0
         self.histories = np.zeros((MAX_CAPACITY, LENGTH, state_dim + action_dim))
+        self.states = np.zeros((MAX_CAPACITY, LENGTH, state_dim))
         self.observations = np.zeros((MAX_CAPACITY, LENGTH, state_dim))
         self.actions = np.zeros((MAX_CAPACITY, LENGTH, action_dim))
         self.rewards = np.zeros((MAX_CAPACITY, LENGTH, 1))
@@ -21,6 +22,7 @@ class ReplayMemory:
         observations = history.get_observations()
         actions = history.get_actions()
         self.histories[self.index] = np.concatenate((states, actions), axis=1)
+        self.states[self.index] = states
         self.observations[self.index] = observations
         self.actions[self.index] = actions
         self.rewards[self.index] = history.get_rewards()
@@ -32,6 +34,9 @@ class ReplayMemory:
     """
     set indices must be called before the following functions
     """
+
+    def sample_states(self):
+        return self.states[self.indices]
 
     def sample_histories(self):
         return self.histories[self.indices]
@@ -49,10 +54,10 @@ class History:
     def __init__(self, state_dim, action_dim):
         self.index = 0
         self.states = np.zeros((LENGTH, state_dim))
-        self.observations = np.zeros((LENGTH, state_dim))
+        self.observations = np.zeros((LENGTH, state_dim)) # observation is just s prime
         self.actions = np.zeros((LENGTH, action_dim))
         self.rewards = np.zeros((LENGTH, 1))
-        self.histories = np.zeros((LENGTH, state_dim + action_dim))
+        self.histories = np.zeros((LENGTH, state_dim + action_dim)) # history is just
 
     def append(self, obs, obs_prime, action, reward):
         self.states[self.index] = obs
