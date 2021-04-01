@@ -32,6 +32,37 @@ class Actor(nn.Module):
         x, hidden_state = self.forward(x, obs, hidden_state)
         return x, hidden_state
 
+class SimpleActor(nn.Module):
+    # Actor provides the next action to take
+    def __init__(self, state_dim, action_dim, limit):
+        super().__init__()
+        self.limit = torch.FloatTensor(limit)
+
+        self.fc1 = nn.Linear(state_dim, 400)
+        nn.init.xavier_uniform_(self.fc1.weight)
+        self.fc2 = nn.Linear(400, 300)
+        nn.init.xavier_uniform_(self.fc2.weight)
+        self.lstm = nn.LSTM(300, 300, batch_first=True)
+        nn.init.xavier_uniform(self.lstm.weight)
+        self.fc3 = nn.Linear(300, action_dim)
+        nn.init.uniform_(self.fc2.weight, -0.003, 0.003)
+
+    def forward(self, state, hidden_states=None):
+        x = F.relu(self.fc1(state))
+        x = F.relu(self.fc2(x))
+        x, states = self.lstm(x, hidden_states)
+        x = F.tanh(self.fc3(x))
+        return x, states
+
+    def inference(self, x, obs):
+        """
+        x is a single dim numpy array (28,)
+        - 28 because state is 24 dim and action is 4 dim
+        """
+        x = x.view(1, -1).unsqueeze(0)
+        obs = obs.view(1, -1).unsqueeze(0)
+        x, hidden_state = self.forward(x, obs)
+        return x, hidden_state
 
 class Critic(nn.Module):
     # Critic estimates the state-value function Q(S, A)

@@ -68,7 +68,7 @@ class History:
         self.index += 1
 
     def get(self):
-        return self.histories[self.index - 1:self.index], self.observations[self.index - 1:self.index]
+        return self.histories[self.index - 1:self.index], self.states[self.index - 1:self.index] # change this back to observations if unsuccessful
 
     def get_states(self):
         return self.states
