@@ -43,7 +43,6 @@ class SimpleActor(nn.Module):
         self.fc2 = nn.Linear(400, 300)
         nn.init.xavier_uniform_(self.fc2.weight)
         self.lstm = nn.LSTM(300, 300, batch_first=True)
-        nn.init.xavier_uniform(self.lstm.weight)
         self.fc3 = nn.Linear(300, action_dim)
         nn.init.uniform_(self.fc2.weight, -0.003, 0.003)
 
